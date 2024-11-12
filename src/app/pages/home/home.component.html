@@ -1,10 +1,26 @@
 <h2>Olympic games app</h2>
 <hr />
 
+<!-- 
+! `*ngIf` pour vérifier si les données sont chargées avant de les afficher, en s’appuyant sur un `Observable` (sous la forme de `olympics$`).
+? utilisation de `| async` est une bonne pratique pour s’abonner directement à un Observable dans le template, ce qui simplifie le code et garantit une gestion automatique des souscriptions et désabonnements, améliorant la performance et la stabilité.
+? `as olympics` crée un alias `olympics` pour les données chargées, rendant le code plus lisible et évitant d'appeler plusieurs fois l'Observable dans le template.
+! si `olympics$` est encore en cours de chargement, le template de fallback `loading` est affiché. 
+-->
 <p *ngIf="olympics$ | async as olympics; else loading">
   {{ olympics.length }} data loaded
 </p>
 
+
+<!-- 
+? ngx-charts : Le composant ngx-charts-pie-chart fait partie de la bibliothèque ngx-charts, utilisée pour créer des graphiques dynamiques dans Angular.
+
+! [results]="medalsData$ | async" : Cet attribut lie les données du graphique aux données chargées dans medalsData$, un Observable, en utilisant | async pour gérer la souscription.
+! [legend]="false" : Les légendes sont désactivées pour simplifier le design.
+! [labels]="true" : Les étiquettes sont activées pour identifier facilement les données affichées.
+! [doughnut]="false" : La configuration spécifie un graphique en camembert (non en beignet).
+! [gradient]="false" : Le dégradé de couleurs est désactivé.
+ -->
 <div class="chart-container">
   <ngx-charts-pie-chart
     [results]="medalsData$ | async"
