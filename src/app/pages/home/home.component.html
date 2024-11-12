@@ -4,6 +4,14 @@
 <p *ngIf="olympics$ | async as olympics; else loading">
   {{ olympics.length }} data loaded
 </p>
+
+<div class="chart-container">
+  <ngx-charts-pie-chart [results]="medalsData" [legend]="false" [labels]="true" [doughnut]="false" [gradient]="false">
+  </ngx-charts-pie-chart>
+</div>
+
+
+
 <ng-template #loading>
   <p>Chargement en cours...</p>
 </ng-template>
