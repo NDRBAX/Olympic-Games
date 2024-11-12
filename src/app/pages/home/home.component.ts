@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { catchError, delay, map, Observable, of } from 'rxjs';
+import { catchError, delay, map, Observable, of, startWith } from 'rxjs';
 import { Olympic } from 'src/app/core/models/Olympic';
 import { Participation } from 'src/app/core/models/Participation';
 import { OlympicService } from 'src/app/core/services/olympic.service';
@@ -11,10 +11,12 @@ import { OlympicService } from 'src/app/core/services/olympic.service';
 })
 export class HomeComponent implements OnInit {
   public olympics$!: Observable<Olympic[]>;
-  public medalsData!: {
-    name: string;
-    value: number;
-  }[];
+  public medalsData$!: Observable<
+    {
+      name: string;
+      value: number;
+    }[]
+  >;
 
   constructor(private olympicService: OlympicService) {}
 
@@ -25,21 +27,22 @@ export class HomeComponent implements OnInit {
       catchError(() => of([])) // En cas d'erreur, retourne un tableau vide
     );
 
-    this.olympics$.subscribe((olympics: Olympic[]) => {
-      this.medalsData = olympics.map((olympic: Olympic) => {
-        return {
-          name: olympic.country,
-          value: olympic.participations.reduce(
-            (acc: number, participation: Participation) =>
-              acc + participation.medalsCount,
-            0
-          ),
-        };
-      });
-    });
+    this.medalsData$ = this.olympics$.pipe(
+      map((olympics: Olympic[]) => {
+        return olympics.map((olympic: Olympic) => {
+          return {
+            name: olympic.country,
+            value: olympic.participations.reduce(
+              (acc: number, participation: Participation) =>
+                acc + participation.medalsCount,
+              0
+            ),
+          };
+        });
+      }),
+      startWith([]) // Commencer avec un tableau vide le temps que les données soient chargées
+    );
   }
-
-  view: [number, number] = [700, 400];
 
   colorScheme = {
     domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA', '#FF8C00'],
