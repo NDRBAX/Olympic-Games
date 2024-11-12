@@ -6,11 +6,14 @@
 </p>
 
 <div class="chart-container">
-  <ngx-charts-pie-chart [results]="medalsData" [legend]="false" [labels]="true" [doughnut]="false" [gradient]="false">
+  <ngx-charts-pie-chart
+    [results]="medalsData$ | async"
+    [legend]="false"
+    [labels]="true"
+    [doughnut]="false"
+    [gradient]="false">
   </ngx-charts-pie-chart>
 </div>
-
-
 
 <ng-template #loading>
   <p>Chargement en cours...</p>
