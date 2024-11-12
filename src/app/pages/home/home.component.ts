@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, delay, map, Observable, of } from 'rxjs';
 import { Olympic } from 'src/app/core/models/Olympic';
 import { OlympicService } from 'src/app/core/services/olympic.service';
 
@@ -15,6 +15,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.olympics$ = this.olympicService.getOlympics().pipe(
+      delay(2000),
       map((data) => data || []), // Si data est null ou undefined, retourne un tableau vide
       catchError(() => of([])) // En cas d'erreur, retourne un tableau vide
     );
