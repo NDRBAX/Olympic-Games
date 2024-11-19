@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Olympic } from '../models/Olympic';
 
@@ -9,31 +9,31 @@ import { Olympic } from '../models/Olympic';
 })
 export class OlympicService {
   private olympicUrl = './assets/mock/olympic.json';
-  private olympics$ = new BehaviorSubject<Olympic[]>([]);
+  private olympics$ = new BehaviorSubject<Olympic[] | null>(null);
+  private error$ = new BehaviorSubject<string | null>(null);
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Charge les données initiales des Jeux Olympiques depuis le fichier JSON.
-   * Utilise un appel HTTP GET pour récupérer les données et les stocke dans le BehaviorSubject olympics$.
-   * Gère également les erreurs en renvoyant un tableau vide et en loggant l'erreur dans la console.
-   */
   loadInitialData(): Observable<Olympic[]> {
     return this.http.get<Olympic[]>(this.olympicUrl).pipe(
-      // `tap` permet d'effectuer des effets de bord, ici pour mettre à jour le BehaviorSubject avec les données reçues
-      tap((value) => this.olympics$.next(value)),
-      // `catchError` permet de capturer les erreurs et d'effectuer des actions spécifiques, ici l'envoi d'un tableau vide dans olympics$
-      catchError((error, caught) => {
-        // TODO: improve error handling
-        console.error(error);
-        // can be useful to end loading state and let the user know something went wrong
-        this.olympics$.next([]);
-        return caught;
+      tap((data) => {
+        this.olympics$.next(data); // Met à jour les données si la requête réussit
+        this.error$.next(null); // Réinitialise l'état d'erreur
+      }),
+      catchError((error) => {
+        console.error('Erreur lors du chargement des données :', error);
+        this.olympics$.next([]); // Définit une liste vide en cas d'erreur
+        this.error$.next('Erreur de chargement des données olympiques.');
+        return throwError(error); // Propagation de l'erreur pour un traitement ultérieur si nécessaire
       })
     );
   }
 
-  getOlympics(): Observable<Olympic[]> {
+  getOlympics(): Observable<Olympic[] | null> {
     return this.olympics$.asObservable();
+  }
+
+  getError(): Observable<string | null> {
+    return this.error$.asObservable();
   }
 }
