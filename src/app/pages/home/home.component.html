@@ -5,7 +5,7 @@
 
     <div class="chart-container">
       <ngx-charts-pie-chart [results]="medalsData$ | async" [legend]="false" [labels]="true" [doughnut]="false"
-        [gradient]="false" />
+        [gradient]="false" (select)="onSelectOpenDetailsPageOfTheCountry($event)" />
 
     </div>
   </ng-container>
