@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, delay, map, Observable, of, startWith } from 'rxjs';
 import { Olympic } from 'src/app/core/models/Olympic';
 import { Participation } from 'src/app/core/models/Participation';
@@ -15,7 +16,7 @@ export class HomeComponent implements OnInit {
   public error$!: Observable<string | null>;
   public isLoading = true;
 
-  constructor(private olympicService: OlympicService) {}
+  constructor(private olympicService: OlympicService, private router: Router) {}
 
   ngOnInit(): void {
     // Charge les données olympiques et gère l'état de chargement et d'erreur
@@ -26,7 +27,6 @@ export class HomeComponent implements OnInit {
 
     // Observable pour récupérer les Jeux Olympiques
     this.olympics$ = this.olympicService.getOlympics().pipe(
-      delay(2000), // Simule un délai de chargement
       map((data) => data || []), // Retourne un tableau vide si data est null ou undefined
       catchError(() => of([])) // Retourne un tableau vide en cas d'erreur
     );
@@ -51,8 +51,8 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  // Schéma de couleurs personnalisé pour le graphique en camembert
-  colorScheme = {
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA', '#FF8C00'],
-  };
+  onSelectOpenDetailsPageOfTheCountry(event: any) {
+    const countryId = event.name;
+    this.router.navigate([`/details/${countryId}`]);
+  }
 }
