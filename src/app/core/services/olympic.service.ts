@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { Olympic } from '../models/Olympic';
 
 @Injectable({
@@ -35,5 +35,33 @@ export class OlympicService {
 
   getError(): Observable<string | null> {
     return this.error$.asObservable();
+  }
+
+  getStatisticsForDashboard(): Observable<{ title: string; value: number }[]> {
+    return this.olympics$.pipe(
+      map((olympics) => {
+        if (!olympics) {
+          return [];
+        }
+
+        const citiesSet = new Set();
+        olympics.forEach((country) => {
+          country.participations.forEach((participation) => {
+            citiesSet.add(participation.city);
+          });
+        });
+
+        return [
+          {
+            title: 'Number of JOs',
+            value: citiesSet.size,
+          },
+          {
+            title: 'Number of countries',
+            value: olympics.length,
+          },
+        ];
+      })
+    );
   }
 }

@@ -1,14 +1,12 @@
-<h2>Olympic games app</h2>
-<hr />
-
 <div *ngIf="isLoading">Chargement des données...</div>
 
 <div *ngIf="!isLoading && !(error$ | async)">
   <ng-container *ngIf="!(error$ | async); else errorTemplate">
+
     <div class="chart-container">
       <ngx-charts-pie-chart [results]="medalsData$ | async" [legend]="false" [labels]="true" [doughnut]="false"
-        [gradient]="false">
-      </ngx-charts-pie-chart>
+        [gradient]="false" />
+
     </div>
   </ng-container>
 </div>
