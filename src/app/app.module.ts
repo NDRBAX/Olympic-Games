@@ -7,6 +7,8 @@ import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { CoreModule } from './core/core.module';
+import { DetailsModule } from './details/details.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent, NotFoundComponent],
@@ -16,6 +18,8 @@ import { CoreModule } from './core/core.module';
     HttpClientModule,
     NgxChartsModule,
     CoreModule,
+    DetailsModule,
+    BrowserAnimationsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

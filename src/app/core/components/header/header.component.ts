@@ -19,14 +19,30 @@ export class HeaderComponent implements OnInit {
     }[]
   >;
 
-  constructor(private olympicService: OlympicService) {}
+  constructor(private router: Router, private olympicService: OlympicService) {}
 
   ngOnInit() {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.updateData();
+      });
+
     this.updateData();
   }
 
   private updateData() {
-    this.title = 'Medals per Country';
-    this.statistics$ = this.olympicService.getStatisticsForDashboard();
+    const currentUrl = this.router.url;
+    if (currentUrl.startsWith('/details/')) {
+      const id: string = this.router.url
+        .split('/details/')[1]
+        .replace('%20', ' ');
+
+      this.title = `Details for ${id}`;
+      this.statistics$ = this.olympicService.getStatisticsForCountry(id);
+    } else if (currentUrl === '/dashboard') {
+      this.title = 'Medals per Country';
+      this.statistics$ = this.olympicService.getStatisticsForDashboard();
+    }
   }
 }
