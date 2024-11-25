@@ -8,7 +8,6 @@
   <img alt="Github top language" src="https://img.shields.io/github/languages/top/NDRBAX/Olympic-Games?color=56BEB8">
   <img alt="Github language count" src="https://img.shields.io/github/languages/count/NDRBAX/Olympic-Games?color=56BEB8">
   <img alt="Repository size" src="https://img.shields.io/github/repo-size/NDRBAX/Olympic-Games?color=56BEB8">
-
 </p>
 
 <p align="center">
