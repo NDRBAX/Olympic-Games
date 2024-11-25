@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter, Observable } from 'rxjs';
+import { filter, Observable, Subscription } from 'rxjs';
 import { OlympicService } from '../../services/olympic.service';
 import { Statistics } from '../../models/Statistics';
 
@@ -9,14 +9,15 @@ import { Statistics } from '../../models/Statistics';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   public title!: string;
   public statistics$!: Observable<Statistics[]>;
+  private routerSubscription!: Subscription;
 
   constructor(private router: Router, private olympicService: OlympicService) {}
 
   ngOnInit() {
-    this.router.events
+    this.routerSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
         this.updateData();
@@ -37,6 +38,12 @@ export class HeaderComponent implements OnInit {
     } else if (currentUrl === '/dashboard') {
       this.title = 'Medals per Country';
       this.statistics$ = this.olympicService.getStatisticsForDashboard();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
     }
   }
 }
