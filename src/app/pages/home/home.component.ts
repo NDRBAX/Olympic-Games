@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { map, Observable, startWith } from 'rxjs';
+import { Medals } from 'src/app/core/models/Medals';
 import { Olympic } from 'src/app/core/models/Olympic';
 import { OlympicService } from 'src/app/core/services/olympic.service';
 
@@ -10,7 +11,7 @@ import { OlympicService } from 'src/app/core/services/olympic.service';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  public medalsData$!: Observable<{ name: string; value: number }[]>;
+  public medalsData$!: Observable<Medals[]>;
 
   constructor(private olympicService: OlympicService, private router: Router) {}
 
@@ -31,7 +32,7 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  onSelectOpenDetailsPageOfTheCountry(event: any) {
+  onSelectOpenDetailsPageOfTheCountry(event: Medals) {
     const countryId = event.name;
     this.router.navigate([`/details/${countryId}`]);
   }
