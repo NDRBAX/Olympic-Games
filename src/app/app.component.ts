@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { BehaviorSubject, delay, filter, Observable, take } from 'rxjs';
 import { OlympicService } from './core/services/olympic.service';
 
@@ -9,11 +9,12 @@ import { OlympicService } from './core/services/olympic.service';
 })
 export class AppComponent implements OnInit {
   public isLoading$ = new BehaviorSubject<boolean>(true);
-  public errorMessage$: Observable<string | null>;
+  public errorMessage$!: Observable<string | null>;
 
-  constructor(private olympicService: OlympicService) {
-    this.errorMessage$ = this.olympicService.getError();
-  }
+  constructor(
+    private olympicService: OlympicService,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     // Load initial data
@@ -21,17 +22,16 @@ export class AppComponent implements OnInit {
 
     // Update loading state
     this.olympicService
-      .getOlympics()
+      .getOlympicsData()
       .pipe(
         filter((olympics) => olympics !== null), // Filter out null values
         take(1), // Take only the first value
         delay(1000) // Simulate loading time
       )
       .subscribe((olympics) => {
-        // If we have data, set loading to false
-        if (olympics !== null && olympics.length > 0) {
-          this.isLoading$.next(false);
-        }
+        this.isLoading$.next(false);
+        this.errorMessage$ = this.olympicService.getError();
+        this.cdRef.detectChanges();
       });
   }
 }

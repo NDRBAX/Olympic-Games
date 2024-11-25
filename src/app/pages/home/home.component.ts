@@ -16,7 +16,7 @@ export class HomeComponent implements OnInit {
   constructor(private olympicService: OlympicService, private router: Router) {}
 
   ngOnInit(): void {
-    this.medalsData$ = this.olympicService.getOlympics().pipe(
+    this.medalsData$ = this.olympicService.getOlympicsData().pipe(
       startWith(null),
       map((olympics: Olympic[] | null) => {
         return olympics
