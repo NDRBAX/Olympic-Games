@@ -1,18 +1,4 @@
-<div *ngIf="isLoading">Chargement des données...</div>
-
-<div *ngIf="!isLoading && !(error$ | async)">
-  <ng-container *ngIf="!(error$ | async); else errorTemplate">
-
-    <div class="chart-container">
-      <ngx-charts-pie-chart [results]="medalsData$ | async" [legend]="false" [labels]="true" [doughnut]="false"
-        [gradient]="false" (select)="onSelectOpenDetailsPageOfTheCountry($event)" />
-
-    </div>
-  </ng-container>
+<div class="chart-container">
+  <ngx-charts-pie-chart [results]="medalsData$ | async" [legend]="false" [labels]="true" [doughnut]="false"
+    [gradient]="false" (select)="onSelectOpenDetailsPageOfTheCountry($event)" />
 </div>
-
-<ng-template #errorTemplate>
-  <div class="error">
-    {{ error$ | async }}
-  </div>
-</ng-template>
