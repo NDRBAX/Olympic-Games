@@ -1,2 +1,18 @@
-<app-header />
-<router-outlet />
+<!-- Loading -->
+<div *ngIf="!(errorMessage$ | async) && (isLoading$ | async)" class="loading">
+  <div class="loader-spinner"></div>
+  <p>Loading data ⏳</p>
+</div>
+
+<!-- Error -->
+<div *ngIf=" (errorMessage$ | async) as error">
+  <div class="error" *ngIf="error">
+    <p>{{ error }}</p>
+  </div>
+</div>
+
+<!-- Main content -->
+<div *ngIf="!(errorMessage$ | async) && !(isLoading$ | async)">
+  <app-header></app-header>
+  <router-outlet></router-outlet>
+</div>
