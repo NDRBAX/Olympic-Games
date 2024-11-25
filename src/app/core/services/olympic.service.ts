@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { catchError, delay, map, tap } from 'rxjs/operators';
+import { catchError, delay, map, switchMap, tap } from 'rxjs/operators';
 import { Olympic } from '../models/Olympic';
 import { Statistics } from '../models/Statistics';
 import { CountryDetails } from '../models/CountryDetails';
@@ -10,36 +10,57 @@ import { CountryDetails } from '../models/CountryDetails';
   providedIn: 'root',
 })
 export class OlympicService {
-  private olympicUrl = './assets/mock/olympic.json';
+  private readonly olympicUrl = './assets/mock/olympic.json';
   private olympics$ = new BehaviorSubject<Olympic[] | null>(null);
   private error$ = new BehaviorSubject<string | null>(null);
 
   constructor(private http: HttpClient) {}
 
   loadInitialData(): Observable<Olympic[]> {
+    if (this.olympics$.value) {
+      return of(this.olympics$.value); // Use cached data
+    }
+
     return this.http.get<Olympic[]>(this.olympicUrl).pipe(
       tap((data) => {
-        this.olympics$.next(data); // Set the data
+        this.olympics$.next(data); // Set data
         this.error$.next(null); // Reset the error message
       }),
-
-      catchError((error) => {
-        return of([]).pipe(
-          delay(2000), // Simulate network latency
-          tap(() => {
-            this.olympics$.next([]); // Create an empty array
-            this.error$.next('Unable to load data. Please try again later 😕'); // Set an error message
-          }),
-          map(() => {
-            throw new Error(this.error$.value ?? 'Unknown error'); // Throw an error
-          })
-        );
-      })
+      catchError((error) =>
+        this.setError('Failed to load data. Please try again later.')
+      )
     );
   }
 
-  getOlympics(): Observable<Olympic[] | null> {
-    return this.olympics$.asObservable();
+  getOlympicsData(): Observable<Olympic[]> {
+    if (!this.olympics$.value) {
+      this.setError('No data available. Please try again later.');
+      return of([]);
+    }
+    return of(this.olympics$.value);
+  }
+
+  private setError(errorMessage: string): Observable<never> {
+    this.error$.next(errorMessage);
+    return throwError(() => new Error(errorMessage));
+  }
+
+  private getCountryDataById(countryId: string): Observable<Olympic> {
+    return this.getOlympicsData().pipe(
+      switchMap((olympics: Olympic[]) => {
+        const country = olympics.find(
+          (olympic) => olympic.country === countryId
+        );
+
+        if (!country) {
+          return this.setError(
+            `Country with ID ${countryId} not found. Please try again later.`
+          );
+        }
+
+        return of(country);
+      })
+    );
   }
 
   getError(): Observable<string | null> {
@@ -55,12 +76,8 @@ export class OlympicService {
    * - "Number of countries": The number of countries that have participated in the Olympics.
    */
   getStatisticsForDashboard(): Observable<Statistics[]> {
-    return this.olympics$.pipe(
+    return this.getOlympicsData().pipe(
       map((olympics) => {
-        if (!olympics) {
-          return [];
-        }
-
         const citiesSet = new Set();
         olympics.forEach((country) => {
           country.participations.forEach((participation) => {
@@ -69,14 +86,8 @@ export class OlympicService {
         });
 
         return [
-          {
-            title: 'Number of JOs',
-            value: citiesSet.size,
-          },
-          {
-            title: 'Number of countries',
-            value: olympics.length,
-          },
+          { title: 'Number of JOs', value: citiesSet.size },
+          { title: 'Number of countries', value: olympics.length },
         ];
       })
     );
@@ -93,20 +104,8 @@ export class OlympicService {
    * - Total number of athletes
    */
   getStatisticsForCountry(countryId: string): Observable<Statistics[]> {
-    return this.olympics$.pipe(
-      map((olympics) => {
-        if (!olympics) {
-          return [];
-        }
-
-        const country = olympics.find(
-          (olympic) => olympic.country === countryId
-        );
-
-        if (!country) {
-          return [];
-        }
-
+    return this.getCountryDataById(countryId).pipe(
+      map((country) => {
         let totalMedals: number = 0,
           totalAthletes: number = 0;
 
@@ -116,18 +115,9 @@ export class OlympicService {
         });
 
         return [
-          {
-            title: 'Number of entries',
-            value: country.participations.length,
-          },
-          {
-            title: 'Total number of medals',
-            value: totalMedals,
-          },
-          {
-            title: 'Total number of athletes',
-            value: totalAthletes,
-          },
+          { title: 'Number of entries', value: country.participations.length },
+          { title: 'Total number of medals', value: totalMedals },
+          { title: 'Total number of athletes', value: totalAthletes },
         ];
       })
     );
@@ -143,37 +133,17 @@ export class OlympicService {
    * - `name`: The name of the city where the participation took place.
    * - `value`: The number of medals won during the participation.
    * - `extra`: An object containing additional information, such as the year of the participation.
-   *
-   * If no olympics data is available or the specified country is not found, an empty array is returned.
    */
   getParticipationsByCountryId(
     countryId: string
   ): Observable<CountryDetails[]> {
-    return this.olympics$.pipe(
-      map((olympics) => {
-        if (!olympics) {
-          return [];
-        }
-
-        const country = olympics.find(
-          (olympic) => olympic.country === countryId
-        );
-
-        if (!country) {
-          return [];
-        }
-
-        const participations = country.participations.map((participation) => {
-          return {
-            name: participation.city,
-            value: participation.medalsCount,
-            extra: {
-              code: participation.year.toString(),
-            },
-          };
-        });
-
-        return participations;
+    return this.getCountryDataById(countryId).pipe(
+      map((country) => {
+        return country.participations.map((participation) => ({
+          name: participation.city,
+          value: participation.medalsCount,
+          extra: { code: participation.year.toString() },
+        }));
       })
     );
   }
