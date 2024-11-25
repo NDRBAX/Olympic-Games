@@ -1,8 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter, Observable, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Component, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter, Observable } from 'rxjs';
 import { OlympicService } from '../../services/olympic.service';
+import { Statistics } from '../../models/Statistics';
 
 @Component({
   selector: 'app-header',
@@ -11,13 +11,7 @@ import { OlympicService } from '../../services/olympic.service';
 })
 export class HeaderComponent implements OnInit {
   public title!: string;
-
-  public statistics$!: Observable<
-    {
-      title: string;
-      value: number;
-    }[]
-  >;
+  public statistics$!: Observable<Statistics[]>;
 
   constructor(private router: Router, private olympicService: OlympicService) {}
 
