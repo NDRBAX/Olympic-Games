@@ -1,14 +1,70 @@
+$primary-color: rgb(0, 119, 128);
+$secondary-color: white;
+$border-radius: 10px;
+$breakpoint-md: 680px;
+
 .header-container {
   display: flex;
   flex-direction: column;
   width: 100%;
   align-items: center;
+
+  h1 {
+    font-weight: 200;
+    color: $secondary-color;
+    background-color: $primary-color;
+    padding: 5px 15px;
+    border: 2px solid $primary-color;
+    border-radius: $border-radius;
+    text-align: center;
+    width: fit-content;
+  }
 }
 
-.header-container h1 {
+.title-container {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 740px;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+
+  @media (max-width: $breakpoint-md) {
+    flex-wrap: wrap;
+    gap: 0 20px;
+  }
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  height: 40px;
+  opacity: 0.8;
   font-weight: 200;
-  color: white;
-  background-color: rgb(0, 119, 128);
+  color: $secondary-color;
+  background-color: $primary-color;
+  padding: 5px 15px;
+  border: 2px solid $primary-color;
+  border-radius: $border-radius;
+  text-align: center;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &:focus {
+    outline: 2px solid lighten($primary-color, 20%);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    position: relative;
+  }
 }
 
 .statistics-container {
@@ -17,25 +73,21 @@
   width: 100%;
   justify-content: center;
   gap: 30px;
-}
 
-.statistic,
-.header-container h1 {
-  padding: 5px 20px;
-  border: 2px solid rgb(0, 119, 128);
-  border-radius: 10px;
-  text-align: center;
-}
+  .statistic {
+    padding: 5px 15px;
+    border: 2px solid $primary-color;
+    border-radius: $border-radius;
+    text-align: center;
 
-.statistic h2,
-.statistic h3 {
-  font-size: 20px;
-}
+    h2 {
+      font-size: 20px;
+      font-weight: 200;
+    }
 
-.statistic h2 {
-  font-weight: 200;
-}
-
-.statistic h3 {
-  font-weight: 700;
+    h3 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+  }
 }
