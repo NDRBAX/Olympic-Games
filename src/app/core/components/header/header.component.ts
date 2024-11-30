@@ -13,6 +13,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   public title!: string;
   public statistics$!: Observable<Statistics[]>;
   private routerSubscription!: Subscription;
+  public displayBackButton = false;
 
   constructor(private router: Router, private olympicService: OlympicService) {}
 
@@ -29,6 +30,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private updateData() {
     const currentUrl = this.router.url;
     if (currentUrl.startsWith('/details/')) {
+      this.displayBackButton = true;
       const id: string = this.router.url
         .split('/details/')[1]
         .replace('%20', ' ');
@@ -36,11 +38,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.title = `Details for ${id}`;
       this.statistics$ = this.olympicService.getStatisticsForCountry(id);
     } else if (currentUrl === '/dashboard') {
+      this.displayBackButton = false;
       this.title = 'Medals per Country';
       this.statistics$ = this.olympicService.getStatisticsForDashboard();
     }
   }
 
+  goBack() {
+    this.router.navigate(['/dashboard']);
+  }
   ngOnDestroy() {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
